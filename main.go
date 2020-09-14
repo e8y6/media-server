@@ -1,37 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"./database"
-	"./media"
+	"./handler"
 
 	"github.com/gorilla/mux"
 )
-
-func fileHandler(w http.ResponseWriter, r *http.Request) {
-
-	urlParams := mux.Vars(r)
-	fileID := urlParams["id"]
-	result := media.GetFileDetails(fileID)
-
-	data, err := ioutil.ReadFile("persist/" + result.Path)
-	if err != nil {
-		panic(err)
-	}
-	w.Write(data)
-
-	fmt.Println(result)
-}
 
 func main() {
 
 	database.Connect()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/{id}", fileHandler)
+	r.HandleFunc("/file/upload", handler.ReceiveFile)
+	r.HandleFunc("/{id}", handler.RenderFile)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
 
 	http.ListenAndServe(":8001", r)
 

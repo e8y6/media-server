@@ -1,28 +1,31 @@
 package media
 
 import (
-	"context"
 	"time"
 
-	"../database"
-
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // FileModel struct for holding th file metadata
 type FileModel struct {
-	ID   primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
-	Path string             `json:"path,omitempty" bson:"path"`
+	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
+	UserID primitive.ObjectID `json:"_id_user,omitempty" bson:"_id_user"`
+
+	FileType     string `json:"file_type,omitempty" bson:"file_type"`
+	Path         string `json:"path,omitempty" bson:"path"`
+	OriginalName string `json:"original_name,omitempty" bson:"original_name"`
+	Size         int64  `json:"size,omitempty" bson:"size"`
+
+	Privacy    int8              `json:"privacy,omitempty" bson:"privacy"`
+	Bucket     int8              `json:"bucket,omitempty" bson:"bucket"`
+	BucketMeta map[string]string `json:"bucket_meta,omitempty" bson:"bucket_meta"`
+
+	CreatedAt time.Time `json:"created_at,omitempty" bson:"created_at"`
+	UpdatedAt time.Time `json:"updated_at,omitempty" bson:"updated_at"`
 }
 
-// GetFileDetails returns the file details
-func GetFileDetails(fileID string) FileModel {
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
-	defer cancel()
-	collection := database.GetCollection("files")
-
-	var result = FileModel{}
-	collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)}).Decode(&result)
-	return result
+type Media interface {
+	Save()
+	isImage() bool
+	ProcessMedia()
 }
