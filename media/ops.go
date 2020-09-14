@@ -35,7 +35,7 @@ func (fileObject *FileModel) ProcessMedia() {
 
 		targetHeight := int(float64(srcHeight) * (float64(targetWidth) / float64(srcWidth)))
 		result := transform.Resize(img, targetWidth, targetHeight, transform.NearestNeighbor)
-		if err := imgio.Save("./persist/"+savePath, result, imgio.JPEGEncoder(60)); err != nil {
+		if err := imgio.Save("./persist/"+savePath, result, imgio.JPEGEncoder(85)); err != nil {
 			fmt.Println(err)
 			return
 		}
