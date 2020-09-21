@@ -37,7 +37,7 @@ func GetFileDetails(fileID string) FileModel {
 	return result
 }
 
-func (fileObject *FileModel) Save() {
+func (fileObject *FileModel) SaveToDatabase() {
 
 	fileObject.ID = primitive.NewObjectID()
 

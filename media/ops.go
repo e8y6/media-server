@@ -43,8 +43,21 @@ func (fileObject *FileModel) ProcessMedia() {
 
 		fileObject.Path = savePath
 
-		fileObject.Save()
+		fileObject.SaveToDatabase()
 
+	}
+
+}
+
+func (fileObject *FileModel) MoveMediaSafe() {
+
+	if fileObject.IsImage() {
+		fmt.Println("moving media222...")
+		UploadToS3(fileObject.Path)
+		fmt.Println("moving media...")
+	} else {
+
+		fmt.Println("not image...")
 	}
 
 }

@@ -25,7 +25,8 @@ type FileModel struct {
 }
 
 type Media interface {
-	Save()
+	SaveToDatabase()
+	MoveMediaSafe()
 	isImage() bool
 	ProcessMedia()
 }

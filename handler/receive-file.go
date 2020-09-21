@@ -49,9 +49,10 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	fileType := findContentType(localFile) // TODO directly from multipart.File
 	privacy, _ := strconv.Atoi(string(r.Form.Get("privacy")))
 	myMedia := media.NewMedia(path, header.Filename, fileType, r.Form.Get("_id_user"), privacy)
-	myMedia.Save()
 
+	myMedia.SaveToDatabase()
 	myMedia.ProcessMedia()
+	myMedia.MoveMediaSafe()
 
 	w.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(myMedia)
