@@ -64,10 +64,10 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	myMedia.BucketMeta = map[string]string{
 		"path": path,
 	}
-	myMedia.Save()
 
 	myMedia.Optimize()
 	myMedia.MoveMediaSafe()
+	myMedia.Save()
 
 	w.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(myMedia)

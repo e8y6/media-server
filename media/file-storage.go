@@ -42,6 +42,8 @@ func UploadToS3(localPath string) (string, string) {
 		panic(err)
 	}
 
+	os.Remove("persist/" + localPath)
+
 	return localPath, bucket
 
 }
@@ -55,7 +57,6 @@ func (fileObject *FileModel) MoveMediaSafe() {
 			"bucket": bucket,
 		}
 		fileObject.Bucket = BUCKET_AWS_S3
-		fileObject.Save()
 	} else {
 
 		fmt.Println("not image...")

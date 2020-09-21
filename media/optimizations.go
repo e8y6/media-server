@@ -38,8 +38,6 @@ func optimizeImage(fileObject *FileModel) {
 	fileObject.FileType = "image/jpeg"
 	fileObject.BucketMeta["path"] = savePath
 
-	fileObject.Save()
-
 }
 
 // Optimize optimizes the file
