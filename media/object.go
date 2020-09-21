@@ -9,6 +9,7 @@ import (
 const (
 	BUCKET_LOCAL  = 0
 	BUCKET_AWS_S3 = 1
+	BUCKET_VIMEO  = 1
 
 	FILETYPE_IMAGE   = 0
 	FILETYPE_VIDEO   = 1
