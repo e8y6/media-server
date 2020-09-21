@@ -25,8 +25,7 @@ type FileModel struct {
 }
 
 type Media interface {
-	SaveToDatabase()
-	UpdateDatabaseEntry()
+	Save()
 
 	MoveMediaSafe()
 	isImage() bool

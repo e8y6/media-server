@@ -50,7 +50,7 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	privacy, _ := strconv.Atoi(string(r.Form.Get("privacy")))
 	myMedia := media.NewMedia(path, header.Filename, fileType, r.Form.Get("_id_user"), privacy)
 
-	myMedia.SaveToDatabase()
+	myMedia.Save()
 	myMedia.ProcessMedia()
 	myMedia.MoveMediaSafe()
 
