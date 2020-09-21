@@ -43,7 +43,7 @@ func (fileObject *FileModel) ProcessMedia() {
 
 		fileObject.Path = savePath
 
-		fileObject.SaveToDatabase()
+		fileObject.UpdateDatabaseEntry()
 
 	}
 

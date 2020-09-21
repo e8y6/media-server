@@ -2,13 +2,13 @@ package media
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"../database"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewMedia(path string, fileName string, fileType string, userId string, privacy int) FileModel {
@@ -17,7 +17,6 @@ func NewMedia(path string, fileName string, fileType string, userId string, priv
 		Path:         path,
 		UserID:       database.StringToObjectID(userId),
 		FileType:     fileType,
-		ID:           primitive.NewObjectID(),
 		OriginalName: fileName,
 		Privacy:      int8(privacy),
 		CreatedAt:    time.Now(),
@@ -31,7 +30,6 @@ func GetFileDetails(fileID string) FileModel {
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
 	collection := database.GetCollection("files")
-
 	var result = FileModel{}
 	collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)}).Decode(&result)
 	return result
@@ -39,7 +37,21 @@ func GetFileDetails(fileID string) FileModel {
 
 func (fileObject *FileModel) SaveToDatabase() {
 
-	fileObject.ID = primitive.NewObjectID()
+	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+	defer cancel()
+	collection := database.GetCollection("files")
+
+	insRes, err := collection.InsertOne(ctx, fileObject)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println()
+
+	fileObject.ID = insRes.InsertedID.(primitive.ObjectID)
+
+}
+
+func (fileObject *FileModel) UpdateDatabaseEntry() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)
 	defer cancel()
@@ -48,7 +60,7 @@ func (fileObject *FileModel) SaveToDatabase() {
 	_, err := collection.UpdateOne(
 		ctx, bson.M{
 			"_id": fileObject.ID,
-		}, bson.M{"$set": fileObject}, options.Update().SetUpsert(true))
+		}, bson.M{"$set": fileObject})
 
 	if err != nil {
 		panic(err)

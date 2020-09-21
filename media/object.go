@@ -8,7 +8,7 @@ import (
 
 // FileModel struct for holding th file metadata
 type FileModel struct {
-	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id"`
+	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	UserID primitive.ObjectID `json:"_id_user,omitempty" bson:"_id_user"`
 
 	FileType     string `json:"file_type,omitempty" bson:"file_type"`
@@ -26,6 +26,8 @@ type FileModel struct {
 
 type Media interface {
 	SaveToDatabase()
+	UpdateDatabaseEntry()
+
 	MoveMediaSafe()
 	isImage() bool
 	ProcessMedia()
