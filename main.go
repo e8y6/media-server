@@ -17,7 +17,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.Handle("/file/upload", RecoverWrap(http.HandlerFunc(handler.ReceiveFile))).Methods("POST")
-	r.Handle("/{ID}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
+	r.Handle("/{id}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
 
 	http.ListenAndServe(":8001", r)
 
