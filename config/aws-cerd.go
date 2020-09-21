@@ -6,7 +6,7 @@ var (
 	// AWSCredentials : AWS credentials
 	AWSCredentials = credentials.NewStaticCredentials(
 		"AKIAQKMXTOR2KBPU3TLH",
-		"VQ+9S7pqbj6eaJL2xwl8+rkWnLM/qZs1GrNYtF2N",
+		"VQ+9S7pqbj6eaJL2xwl8+rkWnLM/qZs1GrNYtF2Nd",
 		"", // a token will be created when the session it's used.
 	)
 	// AWSRegion : AWS Location
