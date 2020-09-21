@@ -7,8 +7,12 @@ import (
 )
 
 const (
-	LOCAL  = 0
-	AWS_S3 = 1
+	BUCKET_LOCAL  = 0
+	BUCKET_AWS_S3 = 1
+
+	FILETYPE_IMAGE   = 0
+	FILETYPE_VIDEO   = 1
+	FILETYPE_UNKNOWN = 2
 )
 
 // FileModel struct for holding th file metadata
@@ -32,6 +36,5 @@ type Media interface {
 	Save()
 
 	MoveMediaSafe()
-	isImage() bool
-	ProcessMedia()
+	Optimize()
 }

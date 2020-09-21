@@ -21,6 +21,7 @@ func GetFileDetails(fileID string) FileModel {
 	return result
 }
 
+// Save Saves the obj in database
 func (fileObject *FileModel) Save() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Second)

@@ -56,7 +56,7 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 		FileType:     fileType,
 		ID:           primitive.NewObjectID(),
 		OriginalName: header.Filename,
-		Bucket:       media.LOCAL,
+		Bucket:       media.BUCKET_LOCAL,
 		Privacy:      int8(privacy),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -66,7 +66,7 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	}
 	myMedia.Save()
 
-	myMedia.ProcessMedia()
+	myMedia.Optimize()
 	myMedia.MoveMediaSafe()
 
 	w.Header().Set("Content-Type", "application/json")

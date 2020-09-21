@@ -19,7 +19,7 @@ func RenderFile(w http.ResponseWriter, r *http.Request) {
 	mjson, _ := json.Marshal(result)
 	fmt.Println(string(mjson))
 
-	if result.Bucket == media.LOCAL {
+	if result.Bucket == media.BUCKET_LOCAL {
 		fmt.Println("persist/" + result.BucketMeta["path"])
 		data, err := ioutil.ReadFile("persist/" + result.BucketMeta["path"])
 		if err != nil {
