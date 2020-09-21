@@ -7,24 +7,8 @@ import (
 	"../database"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-func NewMedia(path string, fileName string, fileType string, userId string, privacy int) FileModel {
-
-	return FileModel{
-		Path:         path,
-		UserID:       database.StringToObjectID(userId),
-		FileType:     fileType,
-		ID:           primitive.NewObjectID(),
-		OriginalName: fileName,
-		Privacy:      int8(privacy),
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-	}
-
-}
 
 // GetFileDetails returns the file details
 func GetFileDetails(fileID string) FileModel {

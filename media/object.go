@@ -6,13 +6,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const (
+	LOCAL  = 0
+	AWS_S3 = 1
+)
+
 // FileModel struct for holding th file metadata
 type FileModel struct {
 	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	UserID primitive.ObjectID `json:"_id_user,omitempty" bson:"_id_user"`
 
 	FileType     string `json:"file_type,omitempty" bson:"file_type"`
-	Path         string `json:"path,omitempty" bson:"path"`
 	OriginalName string `json:"original_name,omitempty" bson:"original_name"`
 	Size         int64  `json:"size,omitempty" bson:"size"`
 

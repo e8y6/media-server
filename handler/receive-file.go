@@ -7,9 +7,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
+	"../database"
 	"../media"
 	"../utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func findContentType(file *os.File) string {
@@ -48,9 +51,21 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	// Create DBentries
 	fileType := findContentType(localFile) // TODO directly from multipart.File
 	privacy, _ := strconv.Atoi(string(r.Form.Get("privacy")))
-	myMedia := media.NewMedia(path, header.Filename, fileType, r.Form.Get("_id_user"), privacy)
-
+	myMedia := media.FileModel{
+		UserID:       database.StringToObjectID(r.Form.Get("_id_user")),
+		FileType:     fileType,
+		ID:           primitive.NewObjectID(),
+		OriginalName: header.Filename,
+		Bucket:       media.LOCAL,
+		Privacy:      int8(privacy),
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	myMedia.BucketMeta = map[string]string{
+		"path": path,
+	}
 	myMedia.Save()
+
 	myMedia.ProcessMedia()
 	myMedia.MoveMediaSafe()
 

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -15,11 +16,16 @@ func RenderFile(w http.ResponseWriter, r *http.Request) {
 	fileID := urlParams["id"]
 	result := media.GetFileDetails(fileID)
 
-	data, err := ioutil.ReadFile("persist/" + result.Path)
-	if err != nil {
-		panic(err)
-	}
-	w.Write(data)
+	mjson, _ := json.Marshal(result)
+	fmt.Println(string(mjson))
 
-	fmt.Println(result)
+	if result.Bucket == media.LOCAL {
+		fmt.Println("persist/" + result.BucketMeta["path"])
+		data, err := ioutil.ReadFile("persist/" + result.BucketMeta["path"])
+		if err != nil {
+			panic(err)
+		}
+		w.Write(data)
+	}
+
 }
