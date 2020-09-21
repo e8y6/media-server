@@ -1,31 +1,60 @@
 package handler
 
 import (
-	"encoding/json"
-	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
+	"../config"
 	"../media"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gorilla/mux"
 )
 
+func serveFromLocal(w *http.ResponseWriter, path string) {
+	data, err := ioutil.ReadFile("persist/" + path)
+	if err != nil {
+		panic(err)
+	}
+	(*w).Write(data)
+}
+
+func serveFromAWSS3(w *http.ResponseWriter, bucketMeta map[string]string) {
+
+	svc := s3.New(session.New(), &aws.Config{
+		Credentials: config.AWSCredentials,
+		Region:      &config.AWSRegion,
+	})
+
+	result, err := svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucketMeta["bucket"]),
+		Key:    aws.String(bucketMeta["key"]),
+	})
+	if err != nil {
+		panic("AWS S3 error")
+	}
+
+	_, err = io.Copy(*w, result.Body)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+// RenderFile renders file with file ID
 func RenderFile(w http.ResponseWriter, r *http.Request) {
 
 	urlParams := mux.Vars(r)
 	fileID := urlParams["id"]
 	result := media.GetFileDetails(fileID)
 
-	mjson, _ := json.Marshal(result)
-	fmt.Println(string(mjson))
-
 	if result.Bucket == media.BUCKET_LOCAL {
-		fmt.Println("persist/" + result.BucketMeta["path"])
-		data, err := ioutil.ReadFile("persist/" + result.BucketMeta["path"])
-		if err != nil {
-			panic(err)
-		}
-		w.Write(data)
+		serveFromLocal(&w, result.BucketMeta["path"])
+	} else if result.Bucket == media.BUCKET_AWS_S3 {
+		serveFromAWSS3(&w, result.BucketMeta)
 	}
 
 }
