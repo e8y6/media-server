@@ -2,6 +2,7 @@ package config
 
 import "github.com/aws/aws-sdk-go/aws/credentials"
 
+// TODO move to some env based thing. Fine for now.
 var (
 	// AWSCredentials : AWS credentials
 	AWSCredentials = credentials.NewStaticCredentials(

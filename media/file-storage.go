@@ -73,7 +73,7 @@ func (u Uploader) UploadFromFile(c *vimeo.Client, uploadURL string, f *os.File) 
 func UploadToVimeo(localPath string) (*vimeo.Video, *vimeo.Response) {
 
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: "8034a23d500b50fa944fed152d2e0ef2"},
+		&oauth2.Token{AccessToken: config.VIMEO_OAuthToken},
 	)
 	tc := oauth2.NewClient(oauth2.NoContext, ts)
 
