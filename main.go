@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
+	"./config"
 	"./database"
 	"./handler"
 
@@ -17,6 +19,7 @@ func main() {
 	r.Handle("/file/upload", RecoverWrap(http.HandlerFunc(handler.ReceiveFile))).Methods("POST")
 	r.Handle("/{id}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
 
-	http.ListenAndServe(":8001", r)
+	fmt.Println(fmt.Sprint("App Starting on ", ":", config.APP_PORT))
+	http.ListenAndServe(fmt.Sprint(":", config.APP_PORT), r)
 
 }
