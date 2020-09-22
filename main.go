@@ -18,6 +18,7 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/file/upload", RecoverWrap(http.HandlerFunc(handler.ReceiveFile))).Methods("POST")
 	r.Handle("/{id}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
+	r.Handle("/{id}/info", RecoverWrap(http.HandlerFunc(handler.FileInfo))).Methods("GET")
 
 	fmt.Println(fmt.Sprint("App Starting on ", ":", config.APP_PORT))
 	http.ListenAndServe(fmt.Sprint(":", config.APP_PORT), r)
