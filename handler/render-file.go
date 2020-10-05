@@ -7,6 +7,7 @@ import (
 
 	"../config"
 	"../media"
+	"../media/storage/vimeo"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -45,6 +46,15 @@ func serveFromAWSS3(w *http.ResponseWriter, bucketMeta map[string]string) {
 
 }
 
+func serveFromVimeo(w *http.ResponseWriter, bucketMeta map[string]string) {
+
+	data := vimeo.GetVideoFilesAsBytes(bucketMeta["uri"])
+
+	(*w).Header().Set("Content-Type", "application/json")
+	(*w).Write(data)
+
+}
+
 // RenderFile renders file with file ID
 func RenderFile(w http.ResponseWriter, r *http.Request) {
 
@@ -56,6 +66,8 @@ func RenderFile(w http.ResponseWriter, r *http.Request) {
 		serveFromLocal(&w, result.BucketMeta["path"])
 	} else if result.Bucket == media.BUCKET_AWS_S3 {
 		serveFromAWSS3(&w, result.BucketMeta)
+	} else if result.Bucket == media.BUCKET_VIMEO {
+		serveFromVimeo(&w, result.BucketMeta)
 	}
 
 }
