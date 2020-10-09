@@ -24,4 +24,8 @@ var (
 
 	// VIMEO_OAuthToken vimeo Oauth token
 	VIMEO_OAuthToken = "ef99c2e4eb68eebca1f4fce3c62742b6"
+	// VIMEO_Folders : VIMEO_Folders flolder list
+	VIMEO_Folders = map[string]string{
+		"generic": "2690221",
+	}
 )

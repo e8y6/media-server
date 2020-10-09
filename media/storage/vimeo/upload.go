@@ -21,7 +21,7 @@ func UploadToVimeo(localPath string) (videoID string, videoLink string) {
 	videoID = strings.Split(videoURI, "/")[2]
 
 	uploadOriginalFile(uploadURL, localPath)
-	moveVideo(videoURI, "2622838")
+	moveVideo(videoURI, config.VIMEO_Folders["generic"])
 
 	return videoID, videoLink
 
