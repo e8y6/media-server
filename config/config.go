@@ -4,6 +4,10 @@ import "github.com/aws/aws-sdk-go/aws/credentials"
 
 // TODO move to some env based thing. Fine for now.
 var (
+
+	// APP_PORT port on which app listens to
+	APP_PORT = 8001
+
 	// AWSCredentials : AWS credentials
 	AWSCredentials = credentials.NewStaticCredentials(
 		"AKIAQKMXTOR2KBPU3TLH",
@@ -17,4 +21,7 @@ var (
 	AWSBuckets = map[string]string{
 		"media_store": "uat-jw-storage",
 	}
+
+	// VIMEO_OAuthToken vimeo Oauth token
+	VIMEO_OAuthToken = "ef99c2e4eb68eebca1f4fce3c62742b6"
 )
