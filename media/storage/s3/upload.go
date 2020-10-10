@@ -14,7 +14,7 @@ func UploadToS3(localPath string) (string, string) {
 
 	bucket := config.AWSBuckets["media_store"]
 
-	file, err := os.Open("persist/" + localPath)
+	file, err := os.Open(config.LOCAL_FOLDER + localPath)
 	if err != nil {
 		panic("Unable to open file")
 	}
@@ -35,7 +35,7 @@ func UploadToS3(localPath string) (string, string) {
 		panic(err)
 	}
 
-	os.Remove("persist/" + localPath)
+	os.Remove(config.LOCAL_FOLDER + localPath)
 
 	return localPath, bucket
 

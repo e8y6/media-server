@@ -17,7 +17,7 @@ import (
 
 func serveFromLocal(w *http.ResponseWriter, path string) {
 	// TODO copy as stream
-	data, err := ioutil.ReadFile("persist/" + path)
+	data, err := ioutil.ReadFile(config.LOCAL_FOLDER + path)
 	if err != nil {
 		panic(err)
 	}

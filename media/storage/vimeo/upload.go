@@ -110,10 +110,10 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	file, errFile1 := os.Open("persist/" + localPath)
+	file, errFile1 := os.Open(config.LOCAL_FOLDER + localPath)
 	defer file.Close()
 	part1,
-		errFile1 := writer.CreateFormFile("file_data", filepath.Base("persist/"+localPath))
+		errFile1 := writer.CreateFormFile("file_data", filepath.Base(config.LOCAL_FOLDER+localPath))
 	_, errFile1 = io.Copy(part1, file)
 	if errFile1 != nil {
 		panic(errFile1)
@@ -144,6 +144,6 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 		panic(err)
 	}
 
-	os.Remove("persist/" + localPath)
+	os.Remove(config.LOCAL_FOLDER + localPath)
 	fmt.Println(string(body))
 }

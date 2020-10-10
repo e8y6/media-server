@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"../config"
+
 	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
 )
@@ -13,7 +15,7 @@ func optimizeImage(fileObject *FileModel) {
 
 	targetWidth := 720
 
-	img, err := imgio.Open("./persist/" + fileObject.BucketMeta["path"])
+	img, err := imgio.Open(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -29,11 +31,11 @@ func optimizeImage(fileObject *FileModel) {
 
 	targetHeight := int(float64(srcHeight) * (float64(targetWidth) / float64(srcWidth)))
 	result := transform.Resize(img, targetWidth, targetHeight, transform.NearestNeighbor)
-	if err := imgio.Save("./persist/"+savePath, result, imgio.JPEGEncoder(85)); err != nil {
+	if err := imgio.Save(config.LOCAL_FOLDER+savePath, result, imgio.JPEGEncoder(85)); err != nil {
 		fmt.Println(err)
 		return
 	}
-	os.Remove("./persist/" + fileObject.BucketMeta["path"])
+	os.Remove(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])
 
 	fileObject.FileType = "image/jpeg"
 	fileObject.BucketMeta["path"] = savePath

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"../config"
 	"../database"
 	"../media"
 	"../utils"
@@ -39,8 +40,8 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 		panic("File not found in the request")
 	}
 	defer httpFile.Close()
-	path := "uploads/" + utils.GenerateFileName(header.Filename)
-	localFile, err := os.OpenFile("./persist/"+path, os.O_CREATE|os.O_RDWR, 0666)
+	path := utils.GenerateFileName(header.Filename)
+	localFile, err := os.OpenFile(config.LOCAL_FOLDER+path, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println(err)
 	}

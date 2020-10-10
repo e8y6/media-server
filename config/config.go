@@ -8,6 +8,9 @@ var (
 	// APP_PORT port on which app listens to
 	APP_PORT = 8001
 
+	// LOCAL_FOLDER port on which app has tosearch for media
+	LOCAL_FOLDER = "./uploads/"
+
 	// AWSCredentials : AWS credentials
 	AWSCredentials = credentials.NewStaticCredentials(
 		"AKIAQKMXTOR2KBPU3TLH",
