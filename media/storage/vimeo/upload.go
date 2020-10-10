@@ -95,18 +95,25 @@ func moveVideo(videoURI string, folder string) {
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	fmt.Println(string(body))
+	defer res.Body.Close()
+	_, err = ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// TODO Handle error here
 }
 
 func uploadOriginalFile(uploadURL string, localPath string) {
 
 	url := uploadURL
 	method := "POST"
-
-	fmt.Println(uploadURL)
 
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
@@ -122,9 +129,6 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(url)
-	fmt.Println(method)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
