@@ -35,8 +35,6 @@ func UploadToS3(localPath string) (string, string) {
 		panic(err)
 	}
 
-	os.Remove(config.LOCAL_FOLDER + localPath)
-
 	return localPath, bucket
 
 }

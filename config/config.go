@@ -15,7 +15,7 @@ var (
 	DATABASE_CONNECTION_URI = "mongodb://localhost:27017/"
 
 	// LOCAL_FOLDER port on which app has tosearch for media
-	LOCAL_FOLDER = "./uploads/"
+	LOCAL_FOLDER = "./persist/uploads/"
 
 	// AWSCredentials : AWS credentials
 	AWSCredentials = credentials.NewStaticCredentials(

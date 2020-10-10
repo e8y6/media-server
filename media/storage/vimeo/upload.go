@@ -143,7 +143,5 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 	if err != nil {
 		panic(err)
 	}
-
-	os.Remove(config.LOCAL_FOLDER + localPath)
 	fmt.Println(string(body))
 }

@@ -29,6 +29,8 @@ type FileModel struct {
 	Bucket     int8              `json:"bucket,omitempty" bson:"bucket"`
 	BucketMeta map[string]string `json:"bucket_meta,omitempty" bson:"bucket_meta"`
 
+	GlacierArchiveID string `json:"glacier_archive_id,omitempty" bson:"glacier_archive_id"`
+
 	CreatedAt time.Time `json:"created_at,omitempty" bson:"created_at"`
 	UpdatedAt time.Time `json:"updated_at,omitempty" bson:"updated_at"`
 }
