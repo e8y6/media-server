@@ -139,9 +139,9 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 		panic(err)
 	}
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	_, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(body))
+	fmt.Println("Vimeo: Upload success for ", localPath)
 }
