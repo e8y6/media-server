@@ -95,10 +95,19 @@ func moveVideo(videoURI string, folder string) {
 	req.Header.Add("Content-Type", "application/json")
 
 	res, err := client.Do(req)
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	fmt.Println(string(body))
+	defer res.Body.Close()
+	_, err = ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// TODO Handle error here
 }
 
 func uploadOriginalFile(uploadURL string, localPath string) {
@@ -106,14 +115,12 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 	url := uploadURL
 	method := "POST"
 
-	fmt.Println(uploadURL)
-
 	payload := &bytes.Buffer{}
 	writer := multipart.NewWriter(payload)
-	file, errFile1 := os.Open("persist/" + localPath)
+	file, errFile1 := os.Open(config.LOCAL_FOLDER + localPath)
 	defer file.Close()
 	part1,
-		errFile1 := writer.CreateFormFile("file_data", filepath.Base("persist/"+localPath))
+		errFile1 := writer.CreateFormFile("file_data", filepath.Base(config.LOCAL_FOLDER+localPath))
 	_, errFile1 = io.Copy(part1, file)
 	if errFile1 != nil {
 		panic(errFile1)
@@ -122,9 +129,6 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(url)
-	fmt.Println(method)
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
@@ -139,11 +143,9 @@ func uploadOriginalFile(uploadURL string, localPath string) {
 		panic(err)
 	}
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	_, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		panic(err)
 	}
-
-	os.Remove("persist/" + localPath)
-	fmt.Println(string(body))
+	fmt.Println("Vimeo: Upload success for ", localPath)
 }
