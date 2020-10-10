@@ -1,16 +1,12 @@
 package database
 
 import (
+	"../config"
 	"go.mongodb.org/mongo-driver/mongo"
-)
-
-const (
-	// DatabaseName Name of the database
-	DatabaseName string = "johny_walker"
 )
 
 // GetCollection returns the collection
 func GetCollection(collectionName string) *mongo.Collection {
-	collection := client.Database(DatabaseName).Collection(collectionName)
+	collection := client.Database(config.DATABASE_NAME).Collection(collectionName)
 	return collection
 }

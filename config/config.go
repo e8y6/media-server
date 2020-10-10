@@ -8,6 +8,12 @@ var (
 	// APP_PORT port on which app listens to
 	APP_PORT = 8001
 
+	// DATABASE_NAME name
+	DATABASE_NAME = "johny_walker"
+
+	// DATABASE_CONNECTION_URI string
+	DATABASE_CONNECTION_URI = "mongodb://localhost:27017/"
+
 	// LOCAL_FOLDER port on which app has tosearch for media
 	LOCAL_FOLDER = "./uploads/"
 
