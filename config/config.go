@@ -28,7 +28,7 @@ var (
 
 	// AWSBuckets : AWS Bucket list
 	AWSBuckets = map[string]string{
-		"media_store": "uat-jw-storage",
+		"media_store": "prod-jw-storage",
 	}
 
 	// VIMEO_OAuthToken vimeo Oauth token
