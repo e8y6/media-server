@@ -17,7 +17,13 @@ func GetFileDetails(fileID string) FileModel {
 	collection := database.GetCollection("files")
 
 	var result = FileModel{}
-	collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)}).Decode(&result)
+	oprRes := collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)})
+
+	if oprRes.Err() != nil {
+		panic("Unable to retrive item[s].")
+	}
+
+	oprRes.Decode(&result)
 	return result
 }
 

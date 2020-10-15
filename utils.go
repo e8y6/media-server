@@ -29,8 +29,10 @@ func RecoverWrap(h http.Handler) http.Handler {
 				}
 				jsonResponse, _ := json.Marshal(res)
 
-				w.Header().Set("Content-Type", "application/json")
-				http.Error(w, string(jsonResponse), http.StatusInternalServerError)
+				w.Header().Add("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write(jsonResponse)
+
 			}
 		}()
 		h.ServeHTTP(w, r)
