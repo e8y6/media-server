@@ -26,8 +26,8 @@ func main() {
 	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_EXTERNAL), externalRouter)
 
 	internalRouter := mux.NewRouter()
-	internalRouter.Handle("/internal/{id}/save", RecoverWrap(http.HandlerFunc(internalapi.SaveFile))).Methods("POST")
-	internalRouter.Handle("/internal/{id}/delete", RecoverWrap(http.HandlerFunc(internalapi.DeleteFile))).Methods("POST")
+	internalRouter.Handle("/file/{id}/save", RecoverWrap(http.HandlerFunc(internalapi.SaveFile))).Methods("POST")
+	internalRouter.Handle("/file/{id}/delete", RecoverWrap(http.HandlerFunc(internalapi.DeleteFile))).Methods("POST")
 
 	fmt.Println(fmt.Sprint("Internal Server Starting on ", ":", config.APP_PORT_INTERNAL))
 	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_INTERNAL), internalRouter)
