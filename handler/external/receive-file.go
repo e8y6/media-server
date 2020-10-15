@@ -1,4 +1,4 @@
-package handler
+package external
 
 import (
 	"encoding/json"
@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
-	"../config"
-	"../database"
-	"../media"
-	"../utils"
+	"../../config"
+	"../../database"
+	"../../media"
+	"../../utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -55,6 +55,7 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	myMedia := media.FileModel{
 		UserID:       database.StringToObjectID(r.Form.Get("_id_user")),
 		FileType:     fileType,
+		IsUsed:       false,
 		ID:           primitive.NewObjectID(),
 		OriginalName: header.Filename,
 		Bucket:       media.BUCKET_LOCAL,
@@ -65,9 +66,6 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	myMedia.BucketMeta = map[string]string{
 		"path": path,
 	}
-
-	myMedia.Optimize()
-	myMedia.MoveMediaSafe()
 	myMedia.Save()
 
 	w.Header().Set("Content-Type", "application/json")

@@ -1,13 +1,13 @@
-package handler
+package external
 
 import (
 	"io"
 	"io/ioutil"
 	"net/http"
 
-	"../config"
-	"../media"
-	"../media/storage/vimeo"
+	"../../config"
+	"../../media"
+	"../../media/storage/vimeo"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"

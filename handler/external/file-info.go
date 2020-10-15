@@ -1,10 +1,10 @@
-package handler
+package external
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"../media"
+	"../../media"
 
 	"github.com/gorilla/mux"
 )
