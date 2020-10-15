@@ -46,12 +46,16 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	path := utils.GenerateFileName(header.Filename)
 	localFile, err := os.OpenFile(config.LOCAL_FOLDER+path, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
-		log.Error("Unable to open file ", err)
+		log.Fatal("Unable to open file ", err)
 		panic("Internal Server error ocurred.")
 	}
 	defer localFile.Close()
 
-	io.Copy(localFile, httpFile)
+	size, err := io.Copy(localFile, httpFile)
+	if err != nil {
+		log.Fatal("Error ocurred while copying uploaded file.", err)
+		panic("Internal Server error ocurred.")
+	}
 	log.Info("Upload File saved to " + path)
 
 	// Create DBentries
@@ -62,6 +66,7 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 		FileType:     fileType,
 		IsUsed:       false,
 		ID:           primitive.NewObjectID(),
+		Size:         size,
 		OriginalName: header.Filename,
 		Bucket:       media.BUCKET_LOCAL,
 		Privacy:      int8(privacy),
