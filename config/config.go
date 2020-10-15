@@ -5,8 +5,11 @@ import "github.com/aws/aws-sdk-go/aws/credentials"
 // TODO move to some env based thing. Fine for now.
 var (
 
-	// APP_PORT port on which app listens to
-	APP_PORT = 8001
+	// APP_PORT port on which app listens to external apps
+	APP_PORT_EXTERNAL = 8001
+
+	// APP_PORT port on which app listens to the internal apps
+	APP_PORT_INTERNAL = 8002
 
 	// DATABASE_NAME name
 	DATABASE_NAME = "johny_walker"

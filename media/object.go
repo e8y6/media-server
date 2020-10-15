@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	BUCKET_LOCAL  = 0
-	BUCKET_AWS_S3 = 1
-	BUCKET_VIMEO  = 2
+	BUCKET_LOCAL      = 0
+	BUCKET_AWS_S3     = 1
+	BUCKET_VIMEO      = 2
+	BUCKET_CLOUDFLARE = 2
 
 	FILETYPE_IMAGE   = 0
 	FILETYPE_VIDEO   = 1
@@ -20,6 +21,8 @@ const (
 type FileModel struct {
 	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
 	UserID primitive.ObjectID `json:"_id_user,omitempty" bson:"_id_user"`
+
+	IsUsed bool `json:"is_used,omitempty" bson:"is_used"`
 
 	FileType     string `json:"file_type,omitempty" bson:"file_type"`
 	OriginalName string `json:"original_name,omitempty" bson:"original_name"`
@@ -33,6 +36,7 @@ type FileModel struct {
 
 	CreatedAt time.Time `json:"created_at,omitempty" bson:"created_at"`
 	UpdatedAt time.Time `json:"updated_at,omitempty" bson:"updated_at"`
+	DeletedAt time.Time `json:"deleted_at,omitempty" bson:"deleted_at,omitempty"`
 }
 
 type Media interface {

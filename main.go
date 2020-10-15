@@ -6,7 +6,8 @@ import (
 
 	"./config"
 	"./database"
-	"./handler"
+	"./handler/external"
+	"./handler/internalapi"
 
 	"github.com/gorilla/mux"
 )
@@ -15,13 +16,22 @@ func main() {
 
 	database.Connect()
 
-	r := mux.NewRouter()
-	r.Handle("/file/upload", RecoverWrap(http.HandlerFunc(handler.ReceiveFile))).Methods("POST")
-	r.Handle("/{id}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
-	r.Handle("/file/{id}", RecoverWrap(http.HandlerFunc(handler.RenderFile))).Methods("GET")
-	r.Handle("/{id}/info", RecoverWrap(http.HandlerFunc(handler.FileInfo))).Methods("GET")
+	externalRouter := mux.NewRouter()
+	externalRouter.Handle("/file/upload", RecoverWrap(http.HandlerFunc(external.ReceiveFile))).Methods("POST")
+	externalRouter.Handle("/{id}", RecoverWrap(http.HandlerFunc(external.RenderFile))).Methods("GET")
+	externalRouter.Handle("/file/{id}", RecoverWrap(http.HandlerFunc(external.RenderFile))).Methods("GET")
+	externalRouter.Handle("/{id}/info", RecoverWrap(http.HandlerFunc(external.FileInfo))).Methods("GET")
 
-	fmt.Println(fmt.Sprint("App Starting on ", ":", config.APP_PORT))
-	http.ListenAndServe(fmt.Sprint(":", config.APP_PORT), r)
+	fmt.Println(fmt.Sprint("Public Server Starting on ", ":", config.APP_PORT_EXTERNAL))
+	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_EXTERNAL), externalRouter)
+
+	internalRouter := mux.NewRouter()
+	internalRouter.Handle("/file/{id}/save", RecoverWrap(http.HandlerFunc(internalapi.SaveFile))).Methods("POST")
+	internalRouter.Handle("/file/{id}/delete", RecoverWrap(http.HandlerFunc(internalapi.DeleteFile))).Methods("POST")
+
+	fmt.Println(fmt.Sprint("Internal Server Starting on ", ":", config.APP_PORT_INTERNAL))
+	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_INTERNAL), internalRouter)
+
+	select {}
 
 }
