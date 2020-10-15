@@ -1,10 +1,10 @@
 package internalapi
 
 import (
-	"fmt"
 	"net/http"
 
 	"../../media"
+	"../../misc/log"
 
 	"github.com/gorilla/mux"
 )
@@ -16,17 +16,15 @@ func SaveFile(w http.ResponseWriter, r *http.Request) {
 	fileObj := media.GetFileDetails(fileID)
 
 	if fileObj.IsUsed {
-		fmt.Println("File already moved to a safe place.")
+		log.Warn("File already moved to a safe place.", fileObj)
 		w.WriteHeader(201)
 		return
 	}
 
-	fmt.Println(fileObj)
-
 	fileObj.Optimize()
 	fileObj.MoveMediaSafe()
 
-	fmt.Println("File Moved to some safe place.")
+	log.Info("File Moved to some safe place.", fileID)
 
 	fileObj.IsUsed = true
 	fileObj.Save()

@@ -8,6 +8,7 @@ import (
 	"../../config"
 	"../../media"
 	"../../media/storage/vimeo"
+	"../../misc/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -19,6 +20,7 @@ func serveFromLocal(w *http.ResponseWriter, path string) {
 	// TODO copy as stream
 	data, err := ioutil.ReadFile(config.LOCAL_FOLDER + path)
 	if err != nil {
+		log.Error("Error ocurred while copying data from local storage.", err)
 		panic(err)
 	}
 	(*w).Write(data)
@@ -36,11 +38,13 @@ func serveFromAWSS3(w *http.ResponseWriter, bucketMeta map[string]string) {
 		Key:    aws.String(bucketMeta["key"]),
 	})
 	if err != nil {
+		log.Error("Error ocurred while find object in S3.", err)
 		panic("AWS S3 error")
 	}
 
 	_, err = io.Copy(*w, result.Body)
 	if err != nil {
+		log.Error("Error ocurred while pulling data from S3.", err)
 		panic(err)
 	}
 

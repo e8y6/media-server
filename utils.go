@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
+	"./misc/log"
 )
 
 // RecoverWrap will provide a gaceful death for panics
@@ -22,7 +24,7 @@ func RecoverWrap(h http.Handler) http.Handler {
 					err = errors.New("Unknown error")
 				}
 
-				// TODO add sentry
+				log.Error("Global exception handler caught an exception", err.Error(), err)
 
 				res := map[string]string{
 					"error": err.Error(),

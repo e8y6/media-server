@@ -1,6 +1,7 @@
 package media
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -43,6 +44,13 @@ func (fileObject *FileModel) MoveMediaSafe() {
 
 	if archiveAccessUploaded && lowLatencyAccessUploaded {
 		os.Remove(config.LOCAL_FOLDER + localPath)
+	}
+
+	if !archiveAccessUploaded {
+		log.Fatal("Archival Upload failed for file ", fileObject)
+	}
+	if !lowLatencyAccessUploaded {
+		log.Fatal("Low latency Upload failed for file ", fileObject)
 	}
 
 }

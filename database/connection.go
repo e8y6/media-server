@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"../config"
@@ -19,12 +20,14 @@ func Connect() {
 	var err error
 	client, err = mongo.NewClient(options.Client().ApplyURI(config.DATABASE_CONNECTION_URI))
 	if err != nil {
+		log.Fatal("Unable to create DB client.", err)
 		panic(err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err = client.Connect(ctx)
 	if err != nil {
+		log.Fatal("Some error ocurred while connecting to DB server", err)
 		panic(err)
 	}
 }
