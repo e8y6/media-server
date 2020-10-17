@@ -8,7 +8,7 @@ import (
 	"../../../config"
 )
 
-func GetVideoFilesAsBytes(videoID string) []byte {
+func getVideoFilesAsBytes(videoID string) []byte {
 
 	url := VIMEO_BURL + "/videos/" + videoID + "?fields=files"
 	method := "GET"
@@ -29,8 +29,7 @@ func GetVideoFilesAsBytes(videoID string) []byte {
 	if err != nil {
 		panic(err)
 	}
-
-	return []byte(body)
+	return body
 }
 
 type videoQualities struct {
@@ -40,7 +39,7 @@ type videoQualities struct {
 
 func GetStreamingURL(videoID string) (lastUrl string) {
 
-	videoDetails := GetVideoFilesAsBytes(videoID)
+	videoDetails := getVideoFilesAsBytes(videoID)
 
 	var UnMJson map[string]json.RawMessage
 	json.Unmarshal(videoDetails, &UnMJson)
