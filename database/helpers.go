@@ -11,7 +11,7 @@ func StringToObjectID(objectIDString string) primitive.ObjectID {
 	if error != nil {
 		panic(exceptions.Exception{
 			Message: "Unable to convert " + objectIDString + " usable form",
-			Type:    exceptions.TYPE_NOT_FOUND,
+			Type:    exceptions.TYPE_PRECONDITION_FAILED,
 		})
 	}
 	return oid

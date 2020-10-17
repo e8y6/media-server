@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"runtime/debug"
 	"strings"
@@ -11,45 +10,48 @@ import (
 	"./misc/log"
 )
 
+type ErrorResponse struct {
+	Message string      `json:"message"`
+	Trace   interface{} `json:"trace,omitempty"`
+}
+
+func GetResponse(err interface{}) (e ErrorResponse, statusCode int) {
+
+	e.Message = "Some error ocurred"
+	statusCode = 500
+
+	if err != nil {
+		switch t := err.(type) {
+		case string:
+			e.Message = t
+		case error:
+			e.Message = t.Error()
+		case exceptions.Exception:
+			e.Message = t.Message
+			statusCode = t.GetStatusCode()
+		}
+	}
+
+	log.Error("Global exception handler caught an exception ", e.Message)
+	e.Trace = strings.Split(string(debug.Stack()), "\n\t")[4:]
+
+	return e, statusCode
+
+}
+
 // RecoverWrap will provide a gaceful death for panics
-func RecoverWrap(h http.Handler) http.Handler {
+func Recover(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var err error
 		defer func() {
 			r := recover()
-			if r != nil {
-				switch t := r.(type) {
-				case string:
-					err = errors.New(t)
-				case error:
-					err = t
-				case exceptions.Exception:
-					res := map[string]interface{}{
-						"error": t.Message,
-						"trace": strings.Split(string(debug.Stack()), "\n\t")[4:],
-					}
-					jsonResponse, _ := json.Marshal(res)
-					w.Header().Add("Content-Type", "application/json")
-					w.WriteHeader(http.StatusInternalServerError)
-					w.Write(jsonResponse)
-					return
-				default:
-					err = errors.New("Unknown error")
-				}
 
-				log.Error("Global exception handler caught an exception ", err.Error())
+			response, statusCode := GetResponse(r)
+			jsonResponse, _ := json.Marshal(response)
 
-				res := map[string]interface{}{
-					"error": err.Error(),
-					"trace": strings.Split(string(debug.Stack()), "\n\t")[4:],
-				}
-				jsonResponse, _ := json.Marshal(res)
+			w.Header().Add("Content-Type", "application/json")
+			w.WriteHeader(statusCode)
+			w.Write(jsonResponse)
 
-				w.Header().Add("Content-Type", "application/json")
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write(jsonResponse)
-
-			}
 		}()
 		h.ServeHTTP(w, r)
 	})
