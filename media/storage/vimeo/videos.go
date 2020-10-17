@@ -1,6 +1,7 @@
 package vimeo
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -29,5 +30,34 @@ func GetVideoFilesAsBytes(videoID string) []byte {
 		panic(err)
 	}
 
-	return body
+	return []byte(body)
+}
+
+type videoQualities struct {
+	Quality string `json:"quality"`
+	Link    string `json:"link"`
+}
+
+func GetStreamingURL(videoID string) (lastUrl string) {
+
+	videoDetails := GetVideoFilesAsBytes(videoID)
+
+	var UnMJson map[string]json.RawMessage
+	json.Unmarshal(videoDetails, &UnMJson)
+
+	var availQualities []videoQualities
+
+	json.Unmarshal(UnMJson["files"], &availQualities)
+
+	for _, quality := range availQualities {
+
+		lastUrl = quality.Link
+		if quality.Quality == "hls" {
+			break
+		}
+
+	}
+
+	return lastUrl
+
 }

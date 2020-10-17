@@ -54,10 +54,13 @@ func serveFromAWSS3(w *http.ResponseWriter, bucketMeta map[string]string) {
 
 func serveFromVimeo(w *http.ResponseWriter, bucketMeta map[string]string) {
 
-	data := vimeo.GetVideoFilesAsBytes(bucketMeta["uri"])
+	url := vimeo.GetStreamingURL(bucketMeta["uri"])
+	op, _ := json.Marshal(map[string]string{
+		"url": url,
+	})
 
 	(*w).Header().Set("Content-Type", "application/json")
-	(*w).Write(data)
+	(*w).Write(op)
 
 }
 
