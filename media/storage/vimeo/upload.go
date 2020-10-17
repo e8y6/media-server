@@ -15,6 +15,12 @@ import (
 	"../../../config"
 )
 
+const (
+	VIMEO_BURL = "https://api.vimeo.com"
+)
+
+// TODO add proper logging for Vimeo
+
 func Upload(localPath string) (videoID string, videoLink string) {
 
 	videoURI, videoLink, uploadURL := createVideo(localPath)

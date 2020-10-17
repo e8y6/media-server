@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"../../../config"
+	"../../../misc/exceptions"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -16,7 +17,11 @@ func UploadToS3(localPath string) (string, string) {
 
 	file, err := os.Open(config.LOCAL_FOLDER + localPath)
 	if err != nil {
-		panic("Unable to open file")
+		panic(exceptions.Exception{
+			Cause: "S3: Unable to open local file for upload path : " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 	defer file.Close()
 
@@ -25,6 +30,14 @@ func UploadToS3(localPath string) (string, string) {
 		Region:      &config.AWSRegion,
 	})
 
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "S3: Error while creating new upload session for file : " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
+
 	uploader := s3manager.NewUploader(sess)
 	_, err = uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(bucket),
@@ -32,7 +45,11 @@ func UploadToS3(localPath string) (string, string) {
 		Body:   file,
 	})
 	if err != nil {
-		panic(err)
+		panic(exceptions.Exception{
+			Cause: "S3: Error while uploading the file : " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 
 	return localPath, bucket

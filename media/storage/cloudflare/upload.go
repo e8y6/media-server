@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"../../../config"
+	"../../../misc/exceptions"
 	"github.com/eventials/go-tus"
 )
 
@@ -14,7 +15,11 @@ func Upload(localPath string) string {
 	f, err := os.Open(config.LOCAL_FOLDER + localPath)
 
 	if err != nil {
-		panic(err)
+		panic(exceptions.Exception{
+			Cause: "Unable to open specified file.",
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 
 	defer f.Close()
@@ -32,17 +37,54 @@ func Upload(localPath string) string {
 		HttpClient:          nil,
 	}
 
-	client, _ := tus.NewClient("https://api.cloudflare.com/client/v4/accounts/"+config.CF_ACCOUNT_ID+"/stream", mConfig)
+	client, err := tus.NewClient("https://api.cloudflare.com/client/v4/accounts/"+config.CF_ACCOUNT_ID+"/stream", mConfig)
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "CF: Unable to create new tus client.",
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
 
-	upload, _ := tus.NewUploadFromFile(f)
+	upload, err := tus.NewUploadFromFile(f)
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "CF: Unable to create new tus upload from client.",
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
 
 	upload.Metadata["requiresignedurls"] = "true"
 
-	uploader, _ := client.CreateUpload(upload)
+	uploader, err := client.CreateUpload(upload)
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "CF: Unable to create new tus uploader.",
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
 
 	uploadUrlExploded := strings.Split(uploader.Url(), "/")
 
-	uploader.Upload()
+	if len(uploadUrlExploded) < 3 {
+		// TODO also check for uid regex
+		panic(exceptions.Exception{
+			Cause: "Unable to fetch UID info for " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
+
+	err = uploader.Upload()
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "CF: Upload failed for ." + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
 
 	return uploadUrlExploded[len(uploadUrlExploded)-1]
 }
