@@ -2,10 +2,10 @@ package database
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"../config"
+	"../misc/log"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,6 +17,7 @@ var (
 
 // Connect to database
 func Connect() {
+	log.Info("Connecting to database.")
 	var err error
 	client, err = mongo.NewClient(options.Client().ApplyURI(config.DATABASE_CONNECTION_URI))
 	if err != nil {
@@ -30,6 +31,7 @@ func Connect() {
 		log.Fatal("Some error ocurred while connecting to DB server", err)
 		panic(err)
 	}
+	log.Info("Connecting to database step completed successfully.")
 }
 
 // GetConnection : Returns the database connection
