@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const MODULE = "EXTERNAL_HANDLER"
+
 type FileInfoResponse struct {
 	FileType  string    `json:"type"`
 	Name      string    `json:"name"`

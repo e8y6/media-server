@@ -1,9 +1,10 @@
 package media
 
 import (
-	"log"
 	"os"
 	"strings"
+
+	"../misc/log"
 
 	"../config"
 	"./storage/cloudflare"
@@ -12,58 +13,54 @@ import (
 	"./storage/vimeo"
 )
 
+func saveImage(fileObject *FileModel) {
+	fileName, bucket := s3.UploadToS3(fileObject.BucketMeta["path"])
+	fileObject.BucketMeta = map[string]string{
+		"key":    fileName,
+		"bucket": bucket,
+	}
+	fileObject.Bucket = BUCKET_AWS_S3
+}
+
+func saveVideo(fileObject *FileModel) {
+	uploadVimeo := false
+
+	var localPath = fileObject.BucketMeta["path"]
+	if uploadVimeo {
+		videoID, videoLink := vimeo.Upload(localPath)
+		fileObject.BucketMeta = map[string]string{
+			"link": videoLink,
+			"uri":  videoID,
+		}
+		fileObject.Bucket = BUCKET_VIMEO
+	} else {
+		videoID := cloudflare.Upload(localPath)
+		fileObject.BucketMeta = map[string]string{
+			"uid": videoID,
+		}
+		fileObject.Bucket = BUCKET_CLOUDFLARE
+	}
+}
+
 // MoveMediaSafe Moves media to somewhere safe
 func (fileObject *FileModel) MoveMediaSafe() {
 
 	var lowLatencyAccessUploaded bool = false
-	var archiveAccessUploaded bool = false
 
 	var localPath = fileObject.BucketMeta["path"]
-
 	if strings.HasPrefix(fileObject.FileType, "image") {
-
-		fileName, bucket := s3.UploadToS3(localPath)
-		fileObject.BucketMeta = map[string]string{
-			"key":    fileName,
-			"bucket": bucket,
-		}
-		fileObject.Bucket = BUCKET_AWS_S3
+		saveImage(fileObject)
 		lowLatencyAccessUploaded = true
-
 	} else if strings.HasPrefix(fileObject.FileType, "video") {
-
-		uploadVimeo := false
-
-		if uploadVimeo {
-
-			videoID, videoLink := vimeo.Upload(localPath)
-			fileObject.BucketMeta = map[string]string{
-				"link": videoLink,
-				"uri":  videoID,
-			}
-			fileObject.Bucket = BUCKET_VIMEO
-		} else {
-			videoID := cloudflare.Upload(localPath)
-			fileObject.BucketMeta = map[string]string{
-				"uid": videoID,
-			}
-			fileObject.Bucket = BUCKET_CLOUDFLARE
-		}
-
+		saveVideo(fileObject)
 		lowLatencyAccessUploaded = true
 	}
 
 	fileObject.GlacierArchiveID = s3glacier.Upload(localPath)
-	archiveAccessUploaded = true
 
-	if archiveAccessUploaded && lowLatencyAccessUploaded {
+	if lowLatencyAccessUploaded {
 		os.Remove(config.LOCAL_FOLDER + localPath)
-	}
-
-	if !archiveAccessUploaded {
-		log.Fatal("Archival Upload failed for file ", fileObject)
-	}
-	if !lowLatencyAccessUploaded {
+	} else {
 		log.Fatal("Low latency Upload failed for file ", fileObject)
 	}
 

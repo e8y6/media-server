@@ -1,11 +1,11 @@
 package media
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
 	"../config"
+	"../misc/log"
 
 	"github.com/anthonynsimon/bild/imgio"
 	"github.com/anthonynsimon/bild/transform"
@@ -17,7 +17,7 @@ func optimizeImage(fileObject *FileModel) {
 
 	img, err := imgio.Open(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])
 	if err != nil {
-		fmt.Println(err)
+		log.Error("Some error ocurred while opening file for image optimization "+fileObject.ID.String(), err)
 		return
 	}
 
@@ -27,12 +27,12 @@ func optimizeImage(fileObject *FileModel) {
 		targetWidth = srcWidth
 	}
 
-	savePath := (strings.Split(fileObject.BucketMeta["path"], "."))[0] + "_opt.jpeg"
+	savePath := (strings.Split(fileObject.BucketMeta["path"], "."))[0] + ".jpeg"
 
 	targetHeight := int(float64(srcHeight) * (float64(targetWidth) / float64(srcWidth)))
 	result := transform.Resize(img, targetWidth, targetHeight, transform.NearestNeighbor)
 	if err := imgio.Save(config.LOCAL_FOLDER+savePath, result, imgio.JPEGEncoder(85)); err != nil {
-		fmt.Println(err)
+		log.Error("Unable to save image after optimization for "+fileObject.ID.String(), err)
 		return
 	}
 	os.Remove(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])

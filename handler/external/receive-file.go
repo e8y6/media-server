@@ -11,6 +11,7 @@ import (
 	"../../config"
 	"../../database"
 	"../../media"
+	"../../misc/exceptions"
 	"../../misc/log"
 	"../../utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,22 +40,30 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	// Upload and save File
 	httpFile, header, err := r.FormFile("file")
 	if err != nil {
-		panic("File not found in the request")
+		panic(exceptions.Exception{
+			Message: "File not found in the request",
+			Type:    exceptions.TYPE_BAD_REQUEST,
+			Error:   err,
+		})
 	}
 	defer httpFile.Close()
 
 	path := utils.GenerateFileName(header.Filename)
 	localFile, err := os.OpenFile(config.LOCAL_FOLDER+path, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
-		log.Fatal("Unable to open file ", err)
-		panic("Internal Server error ocurred.")
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 	defer localFile.Close()
 
 	size, err := io.Copy(localFile, httpFile)
 	if err != nil {
-		log.Fatal("Error ocurred while copying uploaded file.", err)
-		panic("Internal Server error ocurred.")
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 	log.Info("Upload File saved to " + path)
 

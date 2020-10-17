@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"runtime/debug"
+	"strings"
 
+	"./misc/exceptions"
 	"./misc/log"
 )
 
@@ -20,14 +23,25 @@ func RecoverWrap(h http.Handler) http.Handler {
 					err = errors.New(t)
 				case error:
 					err = t
+				case exceptions.Exception:
+					res := map[string]interface{}{
+						"error": t.Message,
+						"trace": strings.Split(string(debug.Stack()), "\n\t")[4:],
+					}
+					jsonResponse, _ := json.Marshal(res)
+					w.Header().Add("Content-Type", "application/json")
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write(jsonResponse)
+					return
 				default:
 					err = errors.New("Unknown error")
 				}
 
 				log.Error("Global exception handler caught an exception ", err.Error())
 
-				res := map[string]string{
+				res := map[string]interface{}{
 					"error": err.Error(),
+					"trace": strings.Split(string(debug.Stack()), "\n\t")[4:],
 				}
 				jsonResponse, _ := json.Marshal(res)
 

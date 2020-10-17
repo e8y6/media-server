@@ -10,7 +10,7 @@ import (
 	"../../media"
 	"../../media/storage/cloudflare"
 	"../../media/storage/vimeo"
-	"../../misc/log"
+	"../../misc/exceptions"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -22,8 +22,10 @@ func serveFromLocal(w *http.ResponseWriter, path string) {
 	// TODO copy as stream
 	data, err := ioutil.ReadFile(config.LOCAL_FOLDER + path)
 	if err != nil {
-		log.Error("Error ocurred while copying data from local storage.", err)
-		panic(err)
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 	(*w).Write(data)
 }
@@ -40,14 +42,21 @@ func serveFromAWSS3(w *http.ResponseWriter, bucketMeta map[string]string) {
 		Key:    aws.String(bucketMeta["key"]),
 	})
 	if err != nil {
-		log.Error("Error ocurred while find object in S3.", err)
-		panic("AWS S3 error")
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+			Cause: "Error ocurred while find object in S3",
+		})
 	}
 
 	_, err = io.Copy(*w, result.Body)
 	if err != nil {
-		log.Error("Error ocurred while pulling data from S3.", err)
-		panic(err)
+		panic(exceptions.Exception{
+			Message: "Socket Hangup",
+			Type:    exceptions.TYPE_BAD_REQUEST,
+			Error:   err,
+			Cause:   "Error ocurred copying data from S3 to client fd",
+		})
 	}
 
 }
