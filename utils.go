@@ -24,7 +24,7 @@ func RecoverWrap(h http.Handler) http.Handler {
 					err = errors.New("Unknown error")
 				}
 
-				log.Error("Global exception handler caught an exception", err.Error(), err)
+				log.Error("Global exception handler caught an exception ", err.Error())
 
 				res := map[string]string{
 					"error": err.Error(),

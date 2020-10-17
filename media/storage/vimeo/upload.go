@@ -15,7 +15,7 @@ import (
 	"../../../config"
 )
 
-func UploadToVimeo(localPath string) (videoID string, videoLink string) {
+func Upload(localPath string) (videoID string, videoLink string) {
 
 	videoURI, videoLink, uploadURL := createVideo(localPath)
 	videoID = strings.Split(videoURI, "/")[2]

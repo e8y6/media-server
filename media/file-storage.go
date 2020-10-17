@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"../config"
+	"./storage/cloudflare"
 	"./storage/s3"
 	"./storage/s3glacier"
 	"./storage/vimeo"
@@ -30,12 +31,25 @@ func (fileObject *FileModel) MoveMediaSafe() {
 		lowLatencyAccessUploaded = true
 
 	} else if strings.HasPrefix(fileObject.FileType, "video") {
-		videoID, videoLink := vimeo.UploadToVimeo(localPath)
-		fileObject.BucketMeta = map[string]string{
-			"link": videoLink,
-			"uri":  videoID,
+
+		uploadVimeo := false
+
+		if uploadVimeo {
+
+			videoID, videoLink := vimeo.Upload(localPath)
+			fileObject.BucketMeta = map[string]string{
+				"link": videoLink,
+				"uri":  videoID,
+			}
+			fileObject.Bucket = BUCKET_VIMEO
+		} else {
+			videoID := cloudflare.Upload(localPath)
+			fileObject.BucketMeta = map[string]string{
+				"uid": videoID,
+			}
+			fileObject.Bucket = BUCKET_CLOUDFLARE
 		}
-		fileObject.Bucket = BUCKET_VIMEO
+
 		lowLatencyAccessUploaded = true
 	}
 
