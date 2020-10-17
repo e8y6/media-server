@@ -20,16 +20,14 @@ func GetResponse(err interface{}) (e ErrorResponse, statusCode int) {
 	e.Message = "Some error ocurred"
 	statusCode = 500
 
-	if err != nil {
-		switch t := err.(type) {
-		case string:
-			e.Message = t
-		case error:
-			e.Message = t.Error()
-		case exceptions.Exception:
-			e.Message = t.Message
-			statusCode = t.GetStatusCode()
-		}
+	switch t := err.(type) {
+	case string:
+		e.Message = t
+	case error:
+		e.Message = t.Error()
+	case exceptions.Exception:
+		e.Message = t.Message
+		statusCode = t.GetStatusCode()
 	}
 
 	log.Error("Global exception handler caught an exception ", e.Message)
@@ -44,6 +42,10 @@ func Recover(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			r := recover()
+
+			if r == nil {
+				return
+			}
 
 			response, statusCode := GetResponse(r)
 			jsonResponse, _ := json.Marshal(response)
