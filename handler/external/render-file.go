@@ -1,12 +1,14 @@
 package external
 
 import (
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 
 	"../../config"
 	"../../media"
+	"../../media/storage/cloudflare"
 	"../../media/storage/vimeo"
 	"../../misc/log"
 
@@ -59,6 +61,19 @@ func serveFromVimeo(w *http.ResponseWriter, bucketMeta map[string]string) {
 
 }
 
+func serveFromCloudflare(w *http.ResponseWriter, bucketMeta map[string]string) {
+
+	url := cloudflare.GetSignedURL("f230c697ae358d1509144bfeb300f436") //(bucketMeta["uid"])
+
+	op, _ := json.Marshal(map[string]string{
+		"url": url,
+	})
+
+	(*w).Header().Set("Content-Type", "application/json")
+	(*w).Write(op)
+
+}
+
 // RenderFile renders file with file ID
 func RenderFile(w http.ResponseWriter, r *http.Request) {
 
@@ -72,6 +87,8 @@ func RenderFile(w http.ResponseWriter, r *http.Request) {
 		serveFromAWSS3(&w, result.BucketMeta)
 	} else if result.Bucket == media.BUCKET_VIMEO {
 		serveFromVimeo(&w, result.BucketMeta)
+	} else if result.Bucket == media.BUCKET_CLOUDFLARE {
+		serveFromCloudflare(&w, result.BucketMeta)
 	}
 
 }
