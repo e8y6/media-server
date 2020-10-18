@@ -75,7 +75,7 @@ func serveFromVimeo(w *http.ResponseWriter, bucketMeta map[string]string) {
 
 func serveFromCloudflare(w *http.ResponseWriter, bucketMeta map[string]string) {
 
-	url := cloudflare.GetSignedURL("f230c697ae358d1509144bfeb300f436") //(bucketMeta["uid"])
+	url := cloudflare.GetSignedURL(bucketMeta["uid"])
 
 	op, _ := json.Marshal(map[string]string{
 		"url": url,
