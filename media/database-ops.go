@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"../database"
+	"../misc/exceptions"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -17,7 +18,17 @@ func GetFileDetails(fileID string) FileModel {
 	collection := database.GetCollection("files")
 
 	var result = FileModel{}
-	collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)}).Decode(&result)
+	oprRes := collection.FindOne(ctx, bson.M{"_id": database.StringToObjectID(fileID)})
+
+	if oprRes.Err() != nil {
+		panic(exceptions.Exception{
+			Message: "Unable to find requested item",
+			Type:    exceptions.TYPE_NOT_FOUND,
+			Error:   oprRes.Err(),
+		})
+	}
+
+	oprRes.Decode(&result)
 	return result
 }
 
@@ -34,7 +45,11 @@ func (fileObject *FileModel) Save() {
 		}, bson.M{"$set": fileObject}, options.Update().SetUpsert(true))
 
 	if err != nil {
-		panic(err)
+		panic(exceptions.Exception{
+			Message: "Unable to update database",
+			Type:    exceptions.TYPE_INTERNAL_ERROR,
+			Error:   err,
+		})
 	}
 
 }

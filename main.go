@@ -8,29 +8,44 @@ import (
 	"./database"
 	"./handler/external"
 	"./handler/internalapi"
+	"./media/storage/cloudflare"
+	"./misc/log"
 
 	"github.com/gorilla/mux"
 )
 
-func main() {
+// Register initialization stuff here
+func boot() {
 
+	// Setup database connection
 	database.Connect()
 
-	externalRouter := mux.NewRouter()
-	externalRouter.Handle("/file/upload", RecoverWrap(http.HandlerFunc(external.ReceiveFile))).Methods("POST")
-	externalRouter.Handle("/{id}", RecoverWrap(http.HandlerFunc(external.RenderFile))).Methods("GET")
-	externalRouter.Handle("/file/{id}", RecoverWrap(http.HandlerFunc(external.RenderFile))).Methods("GET")
-	externalRouter.Handle("/{id}/info", RecoverWrap(http.HandlerFunc(external.FileInfo))).Methods("GET")
+	// Get Signing keys from CF
+	cloudflare.ObtainSigningKeys()
 
-	fmt.Println(fmt.Sprint("Public Server Starting on ", ":", config.APP_PORT_EXTERNAL))
+}
+
+func main() {
+
+	boot()
+
+	externalRouter := mux.NewRouter()
+	externalRouter.Handle("/file/upload", Recover(http.HandlerFunc(external.ReceiveFile))).Methods("POST")
+	externalRouter.Handle("/{id}", Recover(http.HandlerFunc(external.RenderFile))).Methods("GET")
+	externalRouter.Handle("/file/{id}", Recover(http.HandlerFunc(external.RenderFile))).Methods("GET")
+	externalRouter.Handle("/{id}/info", Recover(http.HandlerFunc(external.FileInfo))).Methods("GET")
+
+	log.Info(fmt.Sprint("Public Server Starting on ", ":", config.APP_PORT_EXTERNAL))
 	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_EXTERNAL), externalRouter)
 
 	internalRouter := mux.NewRouter()
-	internalRouter.Handle("/file/{id}/save", RecoverWrap(http.HandlerFunc(internalapi.SaveFile))).Methods("POST")
-	internalRouter.Handle("/file/{id}/delete", RecoverWrap(http.HandlerFunc(internalapi.DeleteFile))).Methods("POST")
+	internalRouter.Handle("/file/{id}/save", Recover(http.HandlerFunc(internalapi.SaveFile))).Methods("POST")
+	internalRouter.Handle("/file/{id}/delete", Recover(http.HandlerFunc(internalapi.DeleteFile))).Methods("POST")
 
-	fmt.Println(fmt.Sprint("Internal Server Starting on ", ":", config.APP_PORT_INTERNAL))
+	log.Info(fmt.Sprint("Internal Server Starting on ", ":", config.APP_PORT_INTERNAL))
 	go http.ListenAndServe(fmt.Sprint(":", config.APP_PORT_INTERNAL), internalRouter)
+
+	log.Info("================================================================================")
 
 	select {}
 

@@ -3,9 +3,10 @@ package s3glacier
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 
 	"../../../config"
+	"../../../misc/exceptions"
+	"../../../misc/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -28,16 +29,27 @@ func Upload(localPath string) string {
 	vaultName := "backup"
 
 	buf, err := ioutil.ReadFile(config.LOCAL_FOLDER + localPath)
+	if err != nil {
+		panic(exceptions.Exception{
+			Cause: "GL: Error while reading local file : " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
 
 	result, err := svc.UploadArchive(&glacier.UploadArchiveInput{
 		VaultName: &vaultName,
 		Body:      bytes.NewReader(buf),
 	})
 	if err != nil {
-		panic(err)
+		panic(exceptions.Exception{
+			Cause: "GL: Error while uploading file : " + localPath,
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 
-	log.Println("Uploaded to archive", *result.ArchiveId)
+	log.Info("Uploaded to archive", *result.ArchiveId)
 
 	return *result.ArchiveId
 }

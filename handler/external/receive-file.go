@@ -2,7 +2,6 @@ package external
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -12,7 +11,10 @@ import (
 	"../../config"
 	"../../database"
 	"../../media"
-	"../../utils"
+	"../../misc/exceptions"
+	"../../misc/log"
+	"../../misc/utils"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -34,20 +36,37 @@ func findContentType(file *os.File) string {
 // ReceiveFile receives file
 func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 
+	log.Info("Upload Started")
+
 	// Upload and save File
 	httpFile, header, err := r.FormFile("file")
 	if err != nil {
-		panic("File not found in the request")
+		panic(exceptions.Exception{
+			Message: "File not found in the request",
+			Type:    exceptions.TYPE_BAD_REQUEST,
+			Error:   err,
+		})
 	}
 	defer httpFile.Close()
+
 	path := utils.GenerateFileName(header.Filename)
 	localFile, err := os.OpenFile(config.LOCAL_FOLDER+path, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
-		fmt.Println(err)
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
 	}
 	defer localFile.Close()
-	io.Copy(localFile, httpFile)
-	// Upload complete
+
+	size, err := io.Copy(localFile, httpFile)
+	if err != nil {
+		panic(exceptions.Exception{
+			Type:  exceptions.TYPE_INTERNAL_ERROR,
+			Error: err,
+		})
+	}
+	log.Info("Upload File saved to " + path)
 
 	// Create DBentries
 	fileType := findContentType(localFile) // TODO directly from multipart.File
@@ -57,16 +76,19 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 		FileType:     fileType,
 		IsUsed:       false,
 		ID:           primitive.NewObjectID(),
+		Size:         size,
 		OriginalName: header.Filename,
 		Bucket:       media.BUCKET_LOCAL,
 		Privacy:      int8(privacy),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
-	}
-	myMedia.BucketMeta = map[string]string{
-		"path": path,
+		BucketMeta: map[string]string{
+			"path": path,
+		},
 	}
 	myMedia.Save()
+
+	log.Info("File object has been created for saved file ", myMedia.ID)
 
 	w.Header().Set("Content-Type", "application/json")
 	response, _ := json.Marshal(myMedia)

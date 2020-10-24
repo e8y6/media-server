@@ -40,4 +40,9 @@ var (
 	VIMEO_Folders = map[string]string{
 		"generic": "2690221",
 	}
+
+	// CF_STREAM_TOKEN Token
+	CF_STREAM_TOKEN = "c1757d9a32a006edc2b3a90444f5749da225c"
+	CF_ACCOUNT_ID   = "c2cea9aa148e4a8aaf4021d9a8f99a3b"
+	CF_EMAIL        = "jobinrjohnson@gmail.com"
 )
