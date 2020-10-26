@@ -10,7 +10,6 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
@@ -19,6 +18,10 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
+
+    - name: Update ENV
+      run: |
+        echo "${{ secrets.ENV }}" > config/config.go
 
     - name: Get dependencies
       run: |
