@@ -30,8 +30,8 @@ func GetResponse(err interface{}) (e ErrorResponse, statusCode int) {
 		statusCode = t.GetStatusCode()
 	}
 
-	log.Error("Global exception handler caught an exception ", e.Message)
 	e.Trace = strings.Split(string(debug.Stack()), "\n\t")[4:]
+	log.Error("Global exception handler caught an exception ", e.Message, e.Trace)
 
 	return e, statusCode
 
