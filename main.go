@@ -30,6 +30,7 @@ func main() {
 	boot()
 
 	externalRouter := mux.NewRouter()
+	externalRouter.Handle("/file/upload", Recover(http.HandlerFunc(external.ReceiveFileOptions))).Methods("OPTIONS")
 	externalRouter.Handle("/file/upload", Recover(http.HandlerFunc(external.ReceiveFile))).Methods("POST")
 	externalRouter.Handle("/{id}", Recover(http.HandlerFunc(external.RenderFile))).Methods("GET")
 	externalRouter.Handle("/file/{id}", Recover(http.HandlerFunc(external.RenderFile))).Methods("GET")

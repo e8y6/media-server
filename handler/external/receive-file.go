@@ -33,10 +33,22 @@ func findContentType(file *os.File) string {
 
 }
 
+func ReceiveFileOptions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Credentials", "true")
+	w.Header().Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, PATCH, DELETE")
+	w.Header().Add("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
+}
+
 // ReceiveFile receives file
 func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("Upload Started")
+	// TODO restructure it
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	w.Header().Add("Access-Control-Allow-Credentials", "true")
+	w.Header().Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, PATCH, DELETE")
+	w.Header().Add("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
 
 	// Upload and save File
 	httpFile, header, err := r.FormFile("file")
