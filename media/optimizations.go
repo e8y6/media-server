@@ -27,6 +27,7 @@ func optimizeImage(fileObject *FileModel) {
 		targetWidth = srcWidth
 	}
 
+	os.Remove(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])
 	savePath := (strings.Split(fileObject.BucketMeta["path"], "."))[0] + ".jpeg"
 
 	targetHeight := int(float64(srcHeight) * (float64(targetWidth) / float64(srcWidth)))
@@ -35,7 +36,6 @@ func optimizeImage(fileObject *FileModel) {
 		log.Error("Unable to save image after optimization for "+fileObject.ID.String(), err)
 		return
 	}
-	os.Remove(config.LOCAL_FOLDER + fileObject.BucketMeta["path"])
 
 	fileObject.FileType = "image/jpeg"
 	fileObject.BucketMeta["path"] = savePath
