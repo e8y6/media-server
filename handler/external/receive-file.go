@@ -38,6 +38,8 @@ func ReceiveFileOptions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Credentials", "true")
 	w.Header().Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, PATCH, DELETE")
 	w.Header().Add("Access-Control-Allow-Headers", r.Header.Get("Access-Control-Request-Headers"))
+
+	w.WriteHeader(200)
 }
 
 // ReceiveFile receives file
